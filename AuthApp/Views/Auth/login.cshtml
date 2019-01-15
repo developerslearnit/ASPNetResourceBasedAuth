@@ -1,0 +1,107 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>login</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link href="~/Content/login.css" rel="stylesheet" />
+</head>
+<body id="LoginForm">
+    <div class="container">
+        
+        <div class="login-form">
+            <div class="main-div">
+                <div class="panel">
+                    <h2>Admin Login</h2>
+                    <p>Please enter your email and password</p>
+                </div>
+                <form id="Login">
+                    <div class="form-group">
+
+                        <input type="text" class="form-control" id="username" placeholder="Username">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="password" placeholder="Password">
+                    </div>
+                    <div class="forgot">
+                        <a href="#">Forgot password?</a>
+                    </div>
+                    <button type="submit" id="btnLogin" class="btn btn-primary">Login</button>
+                </form>
+            </div>
+            
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.33.1/dist/sweetalert2.all.min.js"></script>
+    
+    <script>
+        function doLogin(data) {
+            return $.ajax({
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                type: 'POST',
+                url: "@Url.Action("signIn", "auth",new { area = "" })",
+                data: data
+            });
+        }
+
+        $(function () {
+
+            var homeUrl = "@Url.Action("index", "home", new { area=""})";
+
+            $("#btnLogin").click(function (e) {
+                e.preventDefault();
+               
+                var $self = $(this);
+                $self.attr("disabled", true).html("Checking credentials....");
+
+                var data = JSON.stringify({
+                    username: $("#username").val(),
+                    password:$("#password").val()
+                });
+
+                $.when(doLogin(data)).then(function (response) {
+                    if (response.error == true) {
+                        $self.attr("disabled", false).html("Login");
+                        Swal(
+                            {
+                                type: 'error',
+                                title: 'Oops...',
+                                text: response.message,
+                            }
+                        )
+                    } else {
+                        window.location = homeUrl;
+                    }
+                }).fail(function (err) {
+                    $self.attr("disabled", false).html("Login");
+                    Swal(
+                        {
+                            type: 'error',
+                            title: 'Oops...',
+                            text:"A network error has occured",
+                        }
+                    )
+                });
+
+
+                
+            })
+
+        });
+
+
+    </script>
+
+</body>
+</html>
